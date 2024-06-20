@@ -120,6 +120,7 @@ class SMLMMicroscope(Manager):
     sensor_width: int = 512
     """The width of the sensor in pixels."""
     NA: float = 1.2
+    """The numerical aperture of the microscope."""
     pixel_size: float = 0.1
     magnification: float = 2
     readout_noise: float = 50

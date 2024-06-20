@@ -15,6 +15,7 @@ from akuire.managers.testing import (
 
 
 def create_some_engines():
+    """Create some engines for testing"""
     engine = AcquisitionEngine(
         system_config=SystemConfig(
             managers={

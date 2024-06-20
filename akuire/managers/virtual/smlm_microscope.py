@@ -108,6 +108,8 @@ class Position:
 
 @dataclasses.dataclass
 class SMLMMicroscope(Manager):
+    """A virtual SMLM microscope."""
+
     sensor_height: int = 512
     sensor_width: int = 512
     NA: float = 1.2

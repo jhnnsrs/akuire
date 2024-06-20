@@ -116,7 +116,9 @@ class SMLMMicroscope(Manager):
     """
 
     sensor_height: int = 512
+    """The height of the sensor in pixels."""
     sensor_width: int = 512
+    """The width of the sensor in pixels."""
     NA: float = 1.2
     pixel_size: float = 0.1
     magnification: float = 2

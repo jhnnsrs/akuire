@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "akuire" }]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 aiohttp = "^3.9.5"
 koil = "^0.3.6"
 

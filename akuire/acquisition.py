@@ -15,6 +15,20 @@ class PairedEvent:
 
 @dataclasses.dataclass
 class Acquisition:
+    """Class that represents an acquisition
+
+    An acquisition is a collection of events that are executed in sequence.
+    The events can be of different types and are executed in the order they are provided.
+
+    While the events are executed in sequence, some events might be transpiled
+    into multiple events if the underlying manager does not support the event.
+
+    E.g if the manager does not support a Z-stack acquisition (i.e it cant optimize
+    this into a single event that acquires a Z-stack in one go), the AcquireZStackEvent
+    will be transpiled into multiple MoveZEvents and AcquireFramevents.
+
+    """
+
     events: List[ManagerEvent]
     context: dict = dataclasses.field(default_factory=dict)
 

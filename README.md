@@ -1,5 +1,13 @@
 # akuire
 
+[![codecov](https://codecov.io/gh/jhnnsrs/akuire/branch/master/graph/badge.svg?token=UGXEA2THBV)](https://codecov.io/gh/jhnnsrs/akuire)
+[![PyPI version](https://badge.fury.io/py/akuire.svg)](https://pypi.org/project/akuire/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://pypi.org/project/akuire/)
+![Maintainer](https://img.shields.io/badge/maintainer-jhnnsrs-blue)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/akuire.svg)](https://pypi.python.org/pypi/akuire/)
+[![PyPI status](https://img.shields.io/pypi/status/akuire.svg)](https://pypi.python.org/pypi/akuire/)
+
+
 Akuire is a prototype of asynchronous acquisiton engine for smart-microscopy workflows. It was designed during the "Smart Microscopy" hackathon at the [Lund](https://www.lunduniversity.lu.se/) [Bioimaging Center](https://www.bmc.lu.se/). 
 
 The main goal of Akuire is to provide a simple and flexible way to acquire images from a microscope in an asynchronous way, interfacing with different
@@ -22,7 +30,7 @@ You can use the acquisition engine to acquire images from the microscope through
 
 ```python
 from akuire import AcquisitionEngine, Acquisition, MoveEvent, AcquireZStackEvent, SystemConfig
-from arkuire.managers.testing import NonSweepableCamera, ZStageManager, VirtualStageManager
+from akuire.managers.testing import NonSweepableCamera, ZStageManager, VirtualStageManager
 import asyncio
 
 engine = AcquisitionEngine(

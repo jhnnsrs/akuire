@@ -1,6 +1,7 @@
 from .data_event import DataEvent, HasMovedEvent, ImageDataEvent
 from .manager_event import (
     AcquireFrameEvent,
+    AcquireTSeriesEvent,
     AcquireZStackEvent,
     DeviceChangeEvent,
     ManagerEvent,
@@ -23,4 +24,6 @@ __all__ = [
     "SetLightIntensityEvent",
     "ZChangeEvent",
     "AcquireZStackEvent",
+    "AcquireFrameEvent",
+    "AcquireTSeriesEvent",
 ]

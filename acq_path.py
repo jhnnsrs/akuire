@@ -2,6 +2,8 @@ import asyncio
 from functools import reduce
 from operator import add
 
+import cv2
+import NanoImagingPack as nip
 import napari
 import numpy as np
 import sounddevice as sd
@@ -16,7 +18,35 @@ from akuire.events import (
     MoveEvent,
     SetLightIntensityEvent,
 )
-from akuire.managers.rest.rest_manager import RestManager
+
+
+def calculate_shift(image: np.ndarray) -> tuple[float, float]:
+    Ny, Nx = image.shape
+    mBinary = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    mBinary = nip.gaussf(cv2.erode(mBinary, None, iterations=20), 50)
+
+    # detect max along short axis
+    pxX = np.array(np.argmax(mBinary, 1))
+    pxY = np.arange(0, pxX.shape[0])
+
+    mFct = np.poly1d(np.polyfit(pxY, pxX, 1))
+    # %
+    dy = Ny // 2
+    dx = mFct(dy) - mFct(Nx // 2)
+    mText = (
+        "We are moving the microscope in x:/y: "
+        + str(round(dx, 2))
+        + " / "
+        + str(round(dy, 2))
+    )
+    print(mText)
+    return dx, dy
+
+    # optional: Think about PID?
+
+
+from akuire.helpers import one_shot_snap
+from akuire.managers.rest.rest_manager import OpenUC2RestManager
 from akuire.managers.testing import (
     NonSweepableCamera,
     SweepableManager,
@@ -26,73 +56,47 @@ from akuire.managers.testing import (
 
 
 async def acquire_snap():
-    engine = AcquisitionEngine(
+    async with AcquisitionEngine(
         system_config=SystemConfig(
             managers={
-                "virtual_camera": RestManager(),
+                "virtual_camera": OpenUC2RestManager(),
             }
         ),
         compiler=compile_events,
-    )
+    ) as e:
 
-    party_events_builder = lambda i: [
-        SetLightIntensityEvent(intensity=0.1 * i),
-        MoveEvent(x=300 + (500 * i), y=200 + (500 * i)),
-        AcquireFrameEvent(),
-    ]
+        position_x, position_y = 800, 800
 
-    x = Acquisition(events=party_events_builder(1))
+        images = []
 
-    try:
-        async with engine as e:
-            print("Acquiring snap")
+        for i in range(20):
 
-            
+            result = await e.acquire(
+                Acquisition(
+                    events=[
+                        MoveEvent(x=position_x, y=position_y),
+                        AcquireFrameEvent(),
+                    ]
+                )
+            )
 
+            frame = result.to_z_stack()[0, 0, 0, 0, :, :]
 
-            try:
-                result = await e.acquire(party_events_builder(4))
-            except Exception as e:
+            dx, dy = calculate_shift(frame)
+            position_x = position_x + dx
+            position_y = position_y + dy
+            images.append(frame)
 
-
-
-    except asyncio.CancelledError as e:
-        print("Cancelled")
-        return None
+        return np.stack(images)
 
 
 # Set the threshold for detecting a scream
 THRESHOLD = 10
 
 
-async def controll():
-    task = asyncio.create_task(acquire_snap())
-
-    buffer = []
-
-    def detect_scream(indata, frames, time, status):
-        volume_norm = np.linalg.norm(indata) * 10
-        if volume_norm > THRESHOLD:
-            buffer.append(indata)
-        else:
-            buffer.clear()
-
-        if len(buffer) == 10:
-            print("Scream detected!")
-
-            if not task.done():
-                # task.cancel()
-                pass
-
-    # Open the microphone stream
-    with sd.InputStream(callback=detect_scream):
-        print("Listening for screams...")
-        return await task
-
-
 if __name__ == "__main__":
 
-    x = asyncio.run(controll())
+    x = asyncio.run(acquire_snap())
 
-    napari.view_image(x.to_z_stack())
+    napari.view_image(x)
     napari.run()

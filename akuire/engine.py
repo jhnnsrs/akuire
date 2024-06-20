@@ -28,6 +28,7 @@ from akuire.events import (
     MoveEvent,
     ZChangeEvent,
 )
+from akuire.vars import set_current_engine
 
 Hook = Callable[[DataEvent], Awaitable[None]]
 
@@ -78,9 +79,13 @@ class AcquisitionEngine(KoiledModel):
 
     async def __aenter__(self) -> "AcquisitionEngine":
         self._lock = asyncio.Lock()
+        set_current_engine(self)
+
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
+        self._lock = None
+        set_current_engine(None)
         pass
 
     class Config:

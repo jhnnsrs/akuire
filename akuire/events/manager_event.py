@@ -1,5 +1,6 @@
 import dataclasses
 from functools import reduce
+from operator import add
 
 from akuire.errors import AtomicException
 
@@ -54,6 +55,21 @@ class AcquireZStackEvent(ManagerEvent):
         print(x)
 
         return x
+
+
+@dataclasses.dataclass
+class AcquireTSeriesEvent(ManagerEvent):
+    t_steps: float
+    interval: float | None = None
+    item_exposure_time: float = 100
+
+    def transpile(self) -> list[ManagerEvent]:
+        print("Transpiling z stack")
+
+        return [
+            AcquireFrameEvent(exposure_time=self.item_exposure_time)
+            for t in range(self.t_steps)
+        ]
 
 
 @dataclasses.dataclass

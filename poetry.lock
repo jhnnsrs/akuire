@@ -248,6 +248,39 @@ files = [
 ]
 
 [[package]]
+name = "janus"
+version = "1.0.0"
+description = "Mixed sync-async queue to interoperate between asyncio tasks and classic threads"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "janus-1.0.0-py3-none-any.whl", hash = "sha256:2596ea5482711c1ee3ef2df6c290aaf370a13c55a007826e8f7c32d696d1d00a"},
+    {file = "janus-1.0.0.tar.gz", hash = "sha256:df976f2cdcfb034b147a2d51edfc34ff6bfb12d4e2643d3ad0e10de058cb1612"},
+]
+
+[package.dependencies]
+typing-extensions = ">=3.7.4.3"
+
+[[package]]
+name = "koil"
+version = "0.3.6"
+description = "Async for a sync world"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "koil-0.3.6-py3-none-any.whl", hash = "sha256:5f917f7f0ee29f101f2455ebeae2e83ec8ac6984785aa907d5fb816b25360dc8"},
+    {file = "koil-0.3.6.tar.gz", hash = "sha256:8d4dc000166f8721d88019d8765daccbc62475123eed29b763627743f1cc96bc"},
+]
+
+[package.dependencies]
+janus = ">=1.0.0,<2.0.0"
+qtpy = ">1"
+
+[package.extras]
+process = ["cloudpickle (>=2.2.1,<3.0.0)"]
+uvloop = ["uvloop (>=0.16.0,<0.17.0)"]
+
+[[package]]
 name = "multidict"
 version = "6.0.5"
 description = "multidict implementation"
@@ -430,6 +463,34 @@ docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
 testing = ["coverage (>=6.2)", "hypothesis (>=5.7.1)"]
 
 [[package]]
+name = "qtpy"
+version = "2.4.1"
+description = "Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6)."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "QtPy-2.4.1-py3-none-any.whl", hash = "sha256:1c1d8c4fa2c884ae742b069151b0abe15b3f70491f3972698c683b8e38de839b"},
+    {file = "QtPy-2.4.1.tar.gz", hash = "sha256:a5a15ffd519550a1361bdc56ffc07fda56a6af7292f17c7b395d4083af632987"},
+]
+
+[package.dependencies]
+packaging = "*"
+
+[package.extras]
+test = ["pytest (>=6,!=7.0.0,!=7.0.1)", "pytest-cov (>=3.0.0)", "pytest-qt"]
+
+[[package]]
+name = "typing-extensions"
+version = "4.12.2"
+description = "Backported and Experimental Type Hints for Python 3.8+"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
+    {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
+]
+
+[[package]]
 name = "yarl"
 version = "1.9.4"
 description = "Yet another URL library"
@@ -535,4 +596,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "02e0d7f1ab26d093d287d7f7670c891f728a061e875fe7e65507a9d7cb26870c"
+content-hash = "56710cb9274eefd9689fc3e4b026dc599da75c6b2dcd9ff069a6934f95b8053e"

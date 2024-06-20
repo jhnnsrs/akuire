@@ -9,6 +9,7 @@ packages = [{ include = "akuire" }]
 [tool.poetry.dependencies]
 python = "^3.11"
 aiohttp = "^3.9.5"
+koil = "^0.3.6"
 
 
 [tool.poetry.group.dev.dependencies]

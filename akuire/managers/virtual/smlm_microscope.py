@@ -108,7 +108,12 @@ class Position:
 
 @dataclasses.dataclass
 class SMLMMicroscope(Manager):
-    """A virtual SMLM microscope."""
+    """A virtual SMLM microscope.
+
+    This class simulates a virtual SMLM microscope. It generates images based on the current settings.
+
+
+    """
 
     sensor_height: int = 512
     sensor_width: int = 512

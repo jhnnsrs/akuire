@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "akuire"
+version = "0.1.0"
+description = ""
+authors = ["jhnnsrs <jhnnsrs@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "akuire" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiohttp = "^3.9.5"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest-aiohttp = "^1.0.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

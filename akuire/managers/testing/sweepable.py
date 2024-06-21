@@ -8,6 +8,7 @@ from akuire.events import (
     AcquireFrameEvent,
     AcquireZStackEvent,
     DataEvent,
+    HasMovedEvent,
     ImageDataEvent,
     ManagerEvent,
     ZChangeEvent,
@@ -28,7 +29,7 @@ class SweepableManager(Manager):
 
         if isinstance(event, ZChangeEvent):
             print("Changing z")
-            yield ZChangeEvent(z=event.z)
+            yield HasMovedEvent(z=event.z)
 
         if isinstance(event, AcquireZStackEvent):
             print("Streaming Z-Stack")

@@ -15,7 +15,7 @@ from typing import (
 )
 
 import numpy as np
-from koil import unkoil
+from koil import unkoil, unkoil_gen
 from koil.composition.base import KoiledModel
 
 from akuire.acquisition import Acquisition, AcquisitionResult
@@ -45,12 +45,14 @@ class AcquisitionEngine(KoiledModel):
     system_config: SystemConfig
     compiler: Callable[[Acquisition, SystemConfig], List[ManagerEvent]] = compile_events
     _lock: asyncio.Lock | None = None
+    check_event_type: bool = True
 
-    async def astart(self):
-        pass
+    def acquire_sync(self, x: Acquisition) -> AcquisitionResult:
+        return unkoil(self.acquire, x)
 
-    def start(self):
-        return unkoil(self.astart)
+    def acquire_stream_sync(self, x: Acquisition) -> Generator[DataEvent, None, None]:
+        for i in unkoil_gen(self.acquire_stream, x):
+            yield i
 
     async def acquire_stream(self, x: Acquisition) -> AsyncGenerator[DataEvent, None]:
 
@@ -61,6 +63,10 @@ class AcquisitionEngine(KoiledModel):
                     async for event in self.system_config.managers[
                         paired_event.manager
                     ].compute_event(paired_event.event):
+                        if self.check_event_type and not isinstance(event, DataEvent):
+                            raise TypeError(
+                                f"Event {event} is not a DataEvent. Only DataEvents are allowed in the stream. Inspect the event and manager that produced it. {paired_event.manager} produced {event.__class__}"
+                            )
                         yield event
 
     async def acquire(

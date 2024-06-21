@@ -8,6 +8,7 @@ from akuire.events import (
     AcquireFrameEvent,
     AcquireZStackEvent,
     DataEvent,
+    HasMovedEvent,
     ImageDataEvent,
     ManagerEvent,
     ZChangeEvent,
@@ -22,7 +23,7 @@ class ZStageManager(Manager):
         self, event: ZChangeEvent
     ) -> AsyncGenerator[DataEvent, None]:
         print("Changed Z")
-        yield ZChangeEvent(z=event.z)
+        yield HasMovedEvent(z=event.z)
 
     def challenge(self, event: ManagerEvent) -> bool:
         return isinstance(event, ZChangeEvent)

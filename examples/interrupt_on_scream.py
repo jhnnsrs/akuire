@@ -1,11 +1,20 @@
+""" This example demonstrates how to interrupt an acquisition when a scream is detected. 
+
+
+It uses asyncio tasks to run an acquisition and a sounddevice stream to listen for screams in parallel.
+The acquisition is cancelled when a scream is detected. Interrupting the acquisition is done by calling task.cancel().
+
+
+"""
+
 import asyncio
 from functools import partial, reduce
 from operator import add
 
-import napari
 import numpy as np
 import sounddevice as sd
 
+import smlm_microscope
 from akuire.acquisition import Acquisition, AcquisitionResult
 from akuire.compilers.default import compile_events
 from akuire.config import SystemConfig
@@ -80,7 +89,7 @@ def cancel_on_stream(task: asyncio.Task, indata, frames, time, status):
         print("Scream detected!")
 
         if not task.done():
-            # task.cancel()
+            task.cancel()
             pass
 
 
@@ -97,5 +106,5 @@ if __name__ == "__main__":
 
     x = asyncio.run(controll())
 
-    napari.view_image(x.to_z_stack())
-    napari.run()
+    smlm_microscope.view_image(x.to_z_stack())
+    smlm_microscope.run()

@@ -7,7 +7,7 @@ import NanoImagingPack as nip
 import numpy as np
 import sounddevice as sd
 
-import napari
+import smlm_microscope
 from akuire.acquisition import Acquisition, AcquisitionResult
 from akuire.compilers.default import compile_events
 from akuire.config import SystemConfig

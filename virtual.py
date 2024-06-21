@@ -7,7 +7,7 @@ import NanoImagingPack as nip
 import numpy as np
 import sounddevice as sd
 
-import napari
+import smlm_microscope
 from akuire.acquisition import Acquisition, AcquisitionResult
 from akuire.compilers.default import compile_events
 from akuire.config import SystemConfig
@@ -52,5 +52,5 @@ if __name__ == "__main__":
 
     x = asyncio.run(acquire_snap())
 
-    napari.view_image(x.to_z_stack())
-    napari.run()
+    smlm_microscope.view_image(x.to_z_stack())
+    smlm_microscope.run()

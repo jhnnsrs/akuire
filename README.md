@@ -7,6 +7,7 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/akuire.svg)](https://pypi.python.org/pypi/akuire/)
 [![PyPI status](https://img.shields.io/pypi/status/akuire.svg)](https://pypi.python.org/pypi/akuire/)
 
+[![Akuire Logo](./akuire.png)](./akuire.png)
 
 Akuire is a prototype of asynchronous acquisiton engine for smart-microscopy workflows. It was designed during the "Smart Microscopy" hackathon at the [Lund](https://www.lunduniversity.lu.se/) [Bioimaging Center](https://www.bmc.lu.se/). 
 

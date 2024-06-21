@@ -41,6 +41,8 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
+from akuire.managers.base import BaseManager
+
 # workaround to not break if numba is not installed
 try:
     from numba import njit, prange
@@ -107,7 +109,7 @@ class Position:
 
 
 @dataclasses.dataclass
-class SMLMMicroscope(Manager):
+class SMLMMicroscope(BaseManager):
     """A virtual SMLM microscope.
 
     This class simulates a virtual SMLM microscope. It generates images based on the current settings.
@@ -219,7 +221,7 @@ class SMLMMicroscope(Manager):
 
         if isinstance(event, AcquireFrameEvent):
             print("Acquiring frame")
-            yield ImageDataEvent(data=await self.get_last())
+            yield ImageDataEvent(data=await self.get_last(), device=self.device)
 
         if isinstance(event, SetLightIntensityEvent):
             print("Setting light intensity")
@@ -228,14 +230,14 @@ class SMLMMicroscope(Manager):
         if isinstance(event, AcquireTSeriesEvent):
             print("Acquiring Z-stack")
             for z in range(event.t_steps):
-                yield ImageDataEvent(data=await self.get_last())
+                yield ImageDataEvent(data=await self.get_last(), device=self.device)
 
         if isinstance(event, AcquireZStackEvent):
             print("Acquiring Z-stack")
             z_stack = []
             for z in event.z_steps:
                 self.position.z = z
-                yield ImageDataEvent(data=await self.get_last())
+                yield ImageDataEvent(data=await self.get_last(), device=self.device)
 
         if isinstance(event, MoveEvent):
             print("Moving")
@@ -246,7 +248,12 @@ class SMLMMicroscope(Manager):
             if event.z:
                 self.position.z = event.z
 
-            yield HasMovedEvent(x=self.position.x, y=self.position.y, z=self.position.z)
+            yield HasMovedEvent(
+                x=self.position.x,
+                y=self.position.y,
+                z=self.position.z,
+                device=self.device,
+            )
 
     def challenge(self, event: ManagerEvent) -> bool:
         return isinstance(

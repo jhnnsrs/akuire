@@ -13,11 +13,11 @@ from akuire.events import (
     ManagerEvent,
     ZChangeEvent,
 )
-from akuire.managers.base import Manager
+from akuire.managers.base import BaseManager
 
 
 @dataclasses.dataclass
-class SweepableManager(Manager):
+class SweepableCamera(BaseManager):
 
     async def compute_event(
         self, event: AcquireFrameEvent | ZChangeEvent | AcquireZStackEvent
@@ -25,15 +25,22 @@ class SweepableManager(Manager):
 
         if isinstance(event, AcquireFrameEvent):
             print("Acquiring frame")
-            yield ImageDataEvent(data=np.random.rand(1, 1, 1, 512, 512, 1))
+            await asyncio.sleep(event.exposure_time)
+            yield ImageDataEvent(
+                data=np.random.rand(1, 1, 1, 512, 512, 1), device=self.device
+            )
 
         if isinstance(event, ZChangeEvent):
             print("Changing z")
-            yield HasMovedEvent(z=event.z)
+            yield HasMovedEvent(z=event.z, device=self.device)
 
         if isinstance(event, AcquireZStackEvent):
             print("Streaming Z-Stack")
-            yield ImageDataEvent(data=np.random.rand(1, 1, event.z_steps, 512, 512))
+            for i in range(event.z_steps):
+                await asyncio.sleep(event.item_exposure_time)
+                yield ImageDataEvent(
+                    data=np.random.rand(1, 1, 1, 512, 512), device=self.device
+                )
 
     def challenge(self, event: ManagerEvent) -> bool:
         if isinstance(event, AcquireFrameEvent):

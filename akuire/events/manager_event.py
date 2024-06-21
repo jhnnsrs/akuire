@@ -5,9 +5,9 @@ from operator import add
 from akuire.errors import AtomicException
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class ManagerEvent:
-    pass
+    device: str | None = None
 
     def transpile(self) -> list["ManagerEvent"]:
         raise AtomicException(
@@ -15,23 +15,28 @@ class ManagerEvent:
         )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
+class DelayEvent(ManagerEvent):
+    timeout: float
+
+
+@dataclasses.dataclass(kw_only=True)
 class DeviceChangeEvent(ManagerEvent):
     device: str
     state: bool
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class AcquireFrameEvent(ManagerEvent):
-    exposure_time: float = 100
+    exposure_time: float = dataclasses.field(default=0.1)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class ZChangeEvent(ManagerEvent):
     z: float
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class AcquireZStackEvent(ManagerEvent):
     z_steps: float
     item_exposure_time: float
@@ -57,7 +62,7 @@ class AcquireZStackEvent(ManagerEvent):
         return x
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class AcquireTSeriesEvent(ManagerEvent):
     t_steps: float
     interval: float | None = None
@@ -72,7 +77,7 @@ class AcquireTSeriesEvent(ManagerEvent):
         ]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MoveEvent(ManagerEvent):
     x: float | None = None
     y: float | None = None
@@ -83,22 +88,22 @@ class MoveEvent(ManagerEvent):
         return [MoveXEvent(x=self.x), MoveYEvent(y=self.y)]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MoveXEvent(ManagerEvent):
     x: float
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class GetXEvent(ManagerEvent):
     pass
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class SetLightIntensityEvent(ManagerEvent):
     intensity: float
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class MoveYEvent(ManagerEvent):
     y: float
     pass

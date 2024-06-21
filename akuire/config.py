@@ -14,4 +14,19 @@ class SystemConfig:
 
     """
 
-    managers: dict[str, Manager]
+    managers: list[Manager]
+
+    def get_manager(self, device_name: str) -> Manager:
+        """Get a manager by name.
+
+        Args:
+            manager_name (str): The name of the manager to get.
+
+        Returns:
+            Manager: The manager with the given name.
+
+        """
+        for manager in self.managers:
+            if manager.device == device_name:
+                return manager
+        raise ValueError(f"Manager {device_name} not found")

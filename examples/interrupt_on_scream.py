@@ -12,9 +12,9 @@ from functools import partial, reduce
 from operator import add
 
 import numpy as np
+import smlm_microscope
 import sounddevice as sd
 
-import smlm_microscope
 from akuire.acquisition import Acquisition, AcquisitionResult
 from akuire.compilers.default import compile_events
 from akuire.config import SystemConfig
@@ -28,7 +28,7 @@ from akuire.events import (
 from akuire.managers.rest.rest_manager import RestManager
 from akuire.managers.testing import (
     NonSweepableCamera,
-    SweepableManager,
+    SweepableCamera,
     VirtualStageManager,
     ZStageManager,
 )

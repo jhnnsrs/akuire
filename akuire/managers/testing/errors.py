@@ -1,0 +1,2 @@
+class TestableError(Exception):
+    pass

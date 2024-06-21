@@ -1,4 +1,4 @@
 from .non_sweepable import NonSweepableCamera
 from .stage import VirtualStageManager
-from .sweepable import SweepableManager
+from .sweepable import SweepableCamera
 from .zstage import ZStageManager

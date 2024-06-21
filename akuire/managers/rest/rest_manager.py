@@ -62,7 +62,7 @@ class OpenUC2RestManager(Manager):
                     image = np.array(image)
                     x = np.reshape(image, (1, 1, 1, *image.shape))
                     print(x)
-                    yield ImageDataEvent(data=x)
+                    yield ImageDataEvent(data=x, device=self.device)
 
         if isinstance(event, SetLightIntensityEvent):
             async with aiohttp.ClientSession() as session:
@@ -132,7 +132,7 @@ class OpenUC2RestManager(Manager):
                         t = await response.read()
                         print(t)
 
-                yield HasMovedEvent(x=event.x, y=event.y)
+                yield HasMovedEvent(x=event.x, y=event.y, device=self.device)
 
     def challenge(self, event: ManagerEvent) -> bool:
         if isinstance(event, AcquireFrameEvent):

@@ -14,10 +14,15 @@ from akuire.events import (
 )
 from akuire.managers.base import BaseManager
 
+from .errors import TestableError
+
+
+class FaultyCameraError(TestableError):
+    pass
+
 
 @dataclasses.dataclass
-class NonSweepableCamera(BaseManager):
-    exposition_time_is_sleep: bool = True
+class FaultyCamera(BaseManager):
     __lock = asyncio.Lock()
     __queue = asyncio.Queue()
 
@@ -25,26 +30,18 @@ class NonSweepableCamera(BaseManager):
         self, event: AcquireFrameEvent | ZChangeEvent
     ) -> AsyncGenerator[DataEvent, None]:
 
-        async with self.__lock:
-            if isinstance(event, AcquireFrameEvent):
-                print("Acquiring frame")
-                if self.exposition_time_is_sleep:
-                    await asyncio.sleep(event.exposure_time)
-                yield ImageDataEvent(
-                    data=np.random.rand(
-                        1,
-                        1,
-                        1,
-                        512,
-                        512,
-                    ),
-                    device=self.device,
-                )
+        if isinstance(event, AcquireFrameEvent):
+            print("Acquiring frame")
+            async with self.__lock:
+                raise FaultyCameraError("Camera is faulty")
+
+        # // Just to make python understand that this is a generator
+        yield ImageDataEvent(data=np.random.rand(1, 512, 512, 1))
 
     def challenge(self, event: ManagerEvent) -> bool:
         return isinstance(event, AcquireFrameEvent)
 
-    async def __aenter__(self) -> "NonSweepableCamera":
+    async def __aenter__(self) -> "FaultyCamera":
         self.__lock = asyncio.Lock()
         return self
 

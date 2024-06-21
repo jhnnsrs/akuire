@@ -62,11 +62,11 @@ import asyncio
 
 engine = AcquisitionEngine(
         system_config=SystemConfig(
-            managers={
-                "virtual_camera": NonSweepableCamera(),
-                "virtual_z_stage": ZStageManager(),
-                "virtual_stage": VirtualStageManager(),
-            }
+            managers=[
+                NonSweepableCamera("virtual_camera"),
+                ZStageManager("z_stage"),
+                VirtualStageManager("virtual_stage"),
+            ]
         ),
         compiler=compile_events,
     )
@@ -109,15 +109,14 @@ import asyncio
 
 engine = AcquisitionEngine(
         system_config=SystemConfig(
-            managers={
-                "virtual_camera": NonSweepableCamera(),
-                "virtual_z_stage": ZStageManager(),
-                "virtual_stage": VirtualStageManager(),
-            }
+            managers=[
+                NonSweepableCamera("virtual_camera"),
+                ZStageManager("z_stage"),
+                VirtualStageManager("virtual_stage"),
+            ]
         ),
         compiler=compile_events,
     )
-
 
 x = Acquisition(
     events=[

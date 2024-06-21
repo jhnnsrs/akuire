@@ -10,7 +10,7 @@ from akuire.engine import AcquisitionEngine
 from akuire.events import AcquireZStackEvent, ImageDataEvent, MoveEvent
 from akuire.managers.testing import (
     NonSweepableCamera,
-    SweepableManager,
+    SweepableCamera,
     VirtualStageManager,
     ZStageManager,
 )
@@ -34,7 +34,7 @@ async def long_running_segmentation(data: np.array):
         Acquisition(
             events=[
                 MoveEvent(x=np.random.randint(0, 100), y=np.random.randint(0, 100)),
-                AcquireZStackEvent(z_steps=30, item_exposure_time=0.1),
+                AcquireZStackEvent(z_steps=30, item_exposure_time=0.001),
             ]
         )
         for i in range(np.random.randint(0, 10))
@@ -47,7 +47,7 @@ async def amonitor_position(e, x: 1, y: 2):
     x = Acquisition(
         events=[
             MoveEvent(x=1, y=2),
-            AcquireZStackEvent(z_steps=30, item_exposure_time=0.1),
+            AcquireZStackEvent(z_steps=30, item_exposure_time=0.001),
         ]
     )
 
@@ -66,7 +66,7 @@ async def test_segmentation_multip(default_engine):
     x = Acquisition(
         events=[
             MoveEvent(x=1, y=2),
-            AcquireZStackEvent(z_steps=30, item_exposure_time=0.1),
+            AcquireZStackEvent(z_steps=30, item_exposure_time=0.001),
         ]
     )
     async with default_engine as e:

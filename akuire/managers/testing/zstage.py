@@ -13,17 +13,17 @@ from akuire.events import (
     ManagerEvent,
     ZChangeEvent,
 )
-from akuire.managers.base import Manager
+from akuire.managers.base import BaseManager
 
 
 @dataclasses.dataclass
-class ZStageManager(Manager):
+class ZStageManager(BaseManager):
 
     async def compute_event(
         self, event: ZChangeEvent
     ) -> AsyncGenerator[DataEvent, None]:
         print("Changed Z")
-        yield HasMovedEvent(z=event.z)
+        yield HasMovedEvent(z=event.z, device=self.device)
 
     def challenge(self, event: ManagerEvent) -> bool:
         return isinstance(event, ZChangeEvent)

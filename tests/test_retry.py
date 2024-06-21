@@ -8,7 +8,7 @@ from akuire.engine import AcquisitionEngine
 from akuire.events import AcquireZStackEvent, ImageDataEvent, MoveEvent
 from akuire.managers.testing import (
     NonSweepableCamera,
-    SweepableManager,
+    SweepableCamera,
     VirtualStageManager,
     ZStageManager,
 )
@@ -25,7 +25,7 @@ async def test_retry(default_engine):
     x = Acquisition(
         events=[
             MoveEvent(x=1, y=2),
-            AcquireZStackEvent(z_steps=30, item_exposure_time=0.1),
+            AcquireZStackEvent(z_steps=30, item_exposure_time=0.001),
         ]
     )
     async with default_engine as e:

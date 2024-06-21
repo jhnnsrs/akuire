@@ -57,17 +57,16 @@ class AcquisitionEngine(KoiledModel):
     async def acquire_stream(self, x: Acquisition) -> AsyncGenerator[DataEvent, None]:
 
         events_queue = self.compiler(x, self.system_config)
-        async with self._lock:
-            for paired_events in events_queue:
-                for paired_event in paired_events:
-                    async for event in self.system_config.managers[
-                        paired_event.manager
-                    ].compute_event(paired_event.event):
-                        if self.check_event_type and not isinstance(event, DataEvent):
-                            raise TypeError(
-                                f"Event {event} is not a DataEvent. Only DataEvents are allowed in the stream. Inspect the event and manager that produced it. {paired_event.manager} produced {event.__class__}"
-                            )
-                        yield event
+        for paired_events in events_queue:
+            for paired_event in paired_events:
+                manager = self.system_config.get_manager(paired_event.manager)
+
+                async for event in manager.compute_event(paired_event.event):
+                    if self.check_event_type and not isinstance(event, DataEvent):
+                        raise TypeError(
+                            f"Event {event} is not a DataEvent. Only DataEvents are allowed in the stream. Inspect the event and manager that produced it. {paired_event.manager} produced {event.__class__}"
+                        )
+                    yield event
 
     async def acquire(
         self, x: Acquisition, hooks: list[Hook] | None = None
@@ -87,11 +86,17 @@ class AcquisitionEngine(KoiledModel):
         self._lock = asyncio.Lock()
         set_current_engine(self)
 
+        for manager in self.system_config.managers:
+            await manager.__aenter__()
+
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         self._lock = None
         set_current_engine(None)
+
+        for manager in self.system_config.managers:
+            await manager.__aexit__(exc_type, exc_value, traceback)
         pass
 
     class Config:

@@ -23,7 +23,7 @@ from akuire.events import (
     SetLightIntensityEvent,
     ZChangeEvent,
 )
-from akuire.managers.base import Manager
+from akuire.managers.base import BaseManager, Manager
 
 IS_NIP = True
 
@@ -31,7 +31,7 @@ IS_NIP = True
 FILE_PATH = get_absolute_path("big.jpg")
 
 
-class VirtualMicroscopeManager(Manager):
+class VirtualMicroscopeManager(BaseManager):
 
     def __init__(self, filePath=FILE_PATH):
         self.camera = Camera(self, filePath)
@@ -44,7 +44,7 @@ class VirtualMicroscopeManager(Manager):
 
         if isinstance(event, AcquireFrameEvent):
             print("Acquiring frame")
-            yield ImageDataEvent(data=self.camera.getLast())
+            yield ImageDataEvent(data=self.camera.getLast(), device=self.device)
 
         if isinstance(event, SetLightIntensityEvent):
             print("Setting light intensity")
@@ -56,11 +56,11 @@ class VirtualMicroscopeManager(Manager):
             for z in event.z_values:
                 self.positioner.move(z=z)
                 z_stack.append(self.camera.getLast())
-            yield ImageDataEvent(data=z_stack)
+            yield ImageDataEvent(data=z_stack, device=self.device)
 
         if isinstance(event, MoveEvent):
             print("Moving")
-            self.positioner.move(x=event.x, y=event.y, z=event.z)
+            self.positioner.move(x=event.x, y=event.y, z=event.z, device=self.device)
 
     def challenge(self, event: ManagerEvent) -> bool:
         return isinstance(

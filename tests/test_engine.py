@@ -8,7 +8,7 @@ from akuire.engine import AcquisitionEngine
 from akuire.events import AcquireZStackEvent, ImageDataEvent, MoveEvent
 from akuire.managers.testing import (
     NonSweepableCamera,
-    SweepableManager,
+    SweepableCamera,
     VirtualStageManager,
     ZStageManager,
 )
@@ -18,21 +18,21 @@ def create_some_engines():
     """Create some engines for testing"""
     engine = AcquisitionEngine(
         system_config=SystemConfig(
-            managers={
-                "virtual_camera": NonSweepableCamera(),
-                "virtual_z_stage": ZStageManager(),
-                "virtual_stage": VirtualStageManager(),
-            }
+            managers=[
+                NonSweepableCamera("virtual_camera"),
+                ZStageManager("z_stage"),
+                VirtualStageManager("virtual_stage"),
+            ]
         ),
         compiler=compile_events,
     )
 
     another_engine = AcquisitionEngine(
         system_config=SystemConfig(
-            managers={
-                "virtual_camera": SweepableManager(),
-                "virtual_stage": VirtualStageManager(),
-            }
+            managers=[
+                SweepableCamera("sweepable_camera"),
+                VirtualStageManager("virtual_stage"),
+            ]
         ),
         compiler=compile_events,
     )
@@ -47,7 +47,7 @@ async def test_acquistion_engine(engine):
     x = Acquisition(
         events=[
             MoveEvent(x=1, y=2),
-            AcquireZStackEvent(z_steps=30, item_exposure_time=0.1),
+            AcquireZStackEvent(z_steps=30, item_exposure_time=0.001),
         ]
     )
 

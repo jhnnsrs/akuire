@@ -105,6 +105,3 @@ async def controll():
 if __name__ == "__main__":
 
     x = asyncio.run(controll())
-
-    smlm_microscope.view_image(x.to_z_stack())
-    smlm_microscope.run()

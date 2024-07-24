@@ -29,6 +29,7 @@ from akuire.events import (
     ZChangeEvent,
 )
 from akuire.vars import set_current_engine
+from pydantic import Field
 
 Hook = Callable[[DataEvent], Awaitable[None]]
 
@@ -46,6 +47,10 @@ class AcquisitionEngine(KoiledModel):
     compiler: Callable[[Acquisition, SystemConfig], List[ManagerEvent]] = compile_events
     _lock: asyncio.Lock | None = None
     check_event_type: bool = True
+    subscribers: List[Hook] = Field(default_factory=list)
+
+    def add_subscriber(self, hook: Hook):
+        self.subscribers.append(hook)
 
     def acquire_sync(self, x: Acquisition) -> AcquisitionResult:
         return unkoil(self.acquire, x)
@@ -55,13 +60,15 @@ class AcquisitionEngine(KoiledModel):
             yield i
 
     async def acquire_stream(self, x: Acquisition) -> AsyncGenerator[DataEvent, None]:
-
         events_queue = self.compiler(x, self.system_config)
         for paired_events in events_queue:
             for paired_event in paired_events:
                 manager = self.system_config.get_manager(paired_event.manager)
 
                 async for event in manager.compute_event(paired_event.event):
+                    for i in self.subscribers:
+                        await i(event)
+
                     if self.check_event_type and not isinstance(event, DataEvent):
                         raise TypeError(
                             f"Event {event} is not a DataEvent. Only DataEvents are allowed in the stream. Inspect the event and manager that produced it. {paired_event.manager} produced {event.__class__}"
@@ -71,7 +78,6 @@ class AcquisitionEngine(KoiledModel):
     async def acquire(
         self, x: Acquisition, hooks: list[Hook] | None = None
     ) -> AcquisitionResult:
-
         collected_events = []
         hooks = hooks or []
 

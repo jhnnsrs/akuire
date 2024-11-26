@@ -27,54 +27,76 @@ class DeviceChangeEvent(ManagerEvent):
 
 
 @dataclasses.dataclass(kw_only=True)
+class ArmEvent(ManagerEvent):
+    pass
+
+
+@dataclasses.dataclass(kw_only=True)
+class DisarmEvent(ManagerEvent):
+    pass
+
+
+@dataclasses.dataclass(kw_only=True)
+class LiveCameraEvent(ManagerEvent):
+    pass
+
+
+@dataclasses.dataclass(kw_only=True)
 class AcquireFrameEvent(ManagerEvent):
     exposure_time: float = dataclasses.field(default=0.1)
 
 
 @dataclasses.dataclass(kw_only=True)
-class ZChangeEvent(ManagerEvent):
-    z: float
+class MoveZEvent(ManagerEvent):
+    step: int
+    speed: int = 1000
 
 
 @dataclasses.dataclass(kw_only=True)
 class AcquireZStackEvent(ManagerEvent):
-    z_steps: float
+    z_step: float = 100
+    z_steps: int
     item_exposure_time: float
 
     def transpile(self) -> list[ManagerEvent]:
         print("Transpiling z stack")
-        x = reduce(
-            lambda x, y: list(x) + list(y),
-            list(
-                zip(
-                    [
-                        AcquireFrameEvent(exposure_time=self.item_exposure_time)
-                        for x in range(self.z_steps)
-                    ],
-                    [ZChangeEvent(z=i) for i in range(self.z_steps)],
-                )
-            ),
-            [],
-        )
 
-        print(x)
+        z_stack_events = []
 
-        return x
+        z_stack_events.append(ArmEvent())
+
+        for i in range(self.z_steps):
+            z_stack_events += [
+                AcquireFrameEvent(exposure_time=self.item_exposure_time),
+                MoveZEvent(step=i * self.z_step),
+            ]
+
+        z_stack_events.append(DisarmEvent())
+
+        return z_stack_events
 
 
 @dataclasses.dataclass(kw_only=True)
 class AcquireTSeriesEvent(ManagerEvent):
     t_steps: float
-    interval: float | None = None
+    interval: float = 10
     item_exposure_time: float = 100
 
     def transpile(self) -> list[ManagerEvent]:
         print("Transpiling z stack")
+        t_series_events = []
 
-        return [
-            AcquireFrameEvent(exposure_time=self.item_exposure_time)
-            for t in range(self.t_steps)
-        ]
+        t_series_events.append(ArmEvent())
+
+        for i in range(self.t_steps):
+            t_series_events += [
+                AcquireFrameEvent(exposure_time=self.item_exposure_time),
+                DelayEvent(timeout=self.interval),
+            ]
+
+        t_series_events.append(DisarmEvent())
+
+        return t_series_events
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -90,7 +112,8 @@ class MoveEvent(ManagerEvent):
 
 @dataclasses.dataclass(kw_only=True)
 class MoveXEvent(ManagerEvent):
-    x: float
+    step: int
+    speed: int = 10000
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -104,6 +127,12 @@ class SetLightIntensityEvent(ManagerEvent):
 
 
 @dataclasses.dataclass(kw_only=True)
+class SetLaserStateEvent(ManagerEvent):
+    on: bool
+
+
+@dataclasses.dataclass(kw_only=True)
 class MoveYEvent(ManagerEvent):
-    y: float
+    step: int
+    speed: int = 10000
     pass

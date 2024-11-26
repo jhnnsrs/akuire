@@ -16,7 +16,7 @@ from .manager_event import (
     MoveXEvent,
     MoveYEvent,
     SetLightIntensityEvent,
-    ZChangeEvent,
+    MoveZEvent,
 )
 
 __all__ = [
@@ -29,11 +29,11 @@ __all__ = [
     "MoveXEvent",
     "MoveYEvent",
     "SetLightIntensityEvent",
-    "ZChangeEvent",
     "AcquireZStackEvent",
     "AcquireFrameEvent",
     "AcquireTSeriesEvent",
     "DelayEvent",
     "UncollectedBufferEvent",
     "ZipEvent",
+    "MoveZEvent",
 ]

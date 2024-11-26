@@ -23,10 +23,7 @@ from akuire.compilers.default import compile_events
 from akuire.config import SystemConfig
 from akuire.events import (
     DataEvent,
-    ImageDataEvent,
     ManagerEvent,
-    MoveEvent,
-    ZChangeEvent,
 )
 from akuire.vars import set_current_engine
 from pydantic import Field
@@ -61,23 +58,37 @@ class AcquisitionEngine(KoiledModel):
 
     async def acquire_stream(self, x: Acquisition) -> AsyncGenerator[DataEvent, None]:
         events_queue = self.compiler(x, self.system_config)
-        for paired_events in events_queue:
-            for paired_event in paired_events:
-                manager = self.system_config.get_manager(paired_event.manager)
+        try:
+            for paired_events in events_queue:
+                for paired_event in paired_events:
+                    manager = self.system_config.get_manager(paired_event.manager)
 
-                async for event in manager.compute_event(paired_event.event):
-                    for i in self.subscribers:
-                        await i(event)
+                    async for event in manager.compute_event(paired_event.event):
+                        for i in self.subscribers:
+                            await i(event)
 
-                    if self.check_event_type and not isinstance(event, DataEvent):
-                        raise TypeError(
-                            f"Event {event} is not a DataEvent. Only DataEvents are allowed in the stream. Inspect the event and manager that produced it. {paired_event.manager} produced {event.__class__}"
-                        )
-                    yield event
+                        if self.check_event_type and not isinstance(event, DataEvent):
+                            raise TypeError(
+                                f"Event {event} is not a DataEvent. Only DataEvents are allowed in the stream. Inspect the event and manager that produced it. {paired_event.manager} produced {event.__class__}"
+                            )
+                        yield event
+
+        except Exception as e:
+            print(events_queue)
+            raise e
 
     async def acquire(
-        self, x: Acquisition, hooks: list[Hook] | None = None
+        self,
+        x: Acquisition | ManagerEvent | list[ManagerEvent],
+        hooks: list[Hook] | None = None,
     ) -> AcquisitionResult:
+        if isinstance(x, ManagerEvent):
+            x = Acquisition(events=[x])
+        elif isinstance(x, list):
+            x = Acquisition(events=x)
+
+        assert isinstance(x, Acquisition)
+
         collected_events = []
         hooks = hooks or []
 
@@ -107,4 +118,3 @@ class AcquisitionEngine(KoiledModel):
 
     class Config:
         arbitrary_types_allowed = True
-        underscore_attrs_are_private = True

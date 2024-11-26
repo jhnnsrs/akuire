@@ -72,3 +72,8 @@ class HasMovedEvent(DataEvent):
     z: float | None = None
     pass
     pass
+
+
+@dataclasses.dataclass(kw_only=True)
+class FinishedEvent(DataEvent):
+    pass

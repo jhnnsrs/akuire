@@ -21,9 +21,8 @@ from akuire.events import (
     ManagerEvent,
     MoveEvent,
     SetLightIntensityEvent,
-    ZChangeEvent,
 )
-from akuire.events.manager_event import AcquireTSeriesEvent
+from akuire.events.manager_event import AcquireTSeriesEvent, MoveZEvent
 from akuire.managers.base import Manager
 
 try:
@@ -206,7 +205,6 @@ class SMLMMicroscope(BaseManager):
         return filtered_locs
 
     async def get_last(self) -> np.ndarray:
-
         return await asyncio.to_thread(
             self.produce_smlm_frame,
             x_offset=self.position.x,
@@ -216,9 +214,16 @@ class SMLMMicroscope(BaseManager):
         )
 
     async def compute_event(
-        self, event: AcquireFrameEvent | ZChangeEvent
+        self,
+        event: (
+            AcquireFrameEvent
+            | MoveZEvent
+            | SetLightIntensityEvent
+            | AcquireZStackEvent
+            | AcquireTSeriesEvent
+            | MoveEvent
+        ),
     ) -> AsyncGenerator[DataEvent, None]:
-
         if isinstance(event, AcquireFrameEvent):
             print("Acquiring frame")
             yield ImageDataEvent(data=await self.get_last(), device=self.device)
@@ -254,18 +259,6 @@ class SMLMMicroscope(BaseManager):
                 z=self.position.z,
                 device=self.device,
             )
-
-    def challenge(self, event: ManagerEvent) -> bool:
-        return isinstance(
-            event,
-            (
-                AcquireFrameEvent,
-                SetLightIntensityEvent,
-                AcquireZStackEvent,
-                MoveEvent,
-                AcquireTSeriesEvent,
-            ),
-        )
 
 
 @dataclasses.dataclass

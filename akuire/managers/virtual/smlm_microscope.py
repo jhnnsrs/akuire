@@ -45,7 +45,7 @@ from akuire.managers.base import BaseManager
 # workaround to not break if numba is not installed
 try:
     from numba import njit, prange
-except ModuleNotFoundError:
+except ImportError:
     prange = range
 
     def njit(*args, **kwargs):
@@ -58,7 +58,7 @@ except ModuleNotFoundError:
 # workaroung to not break if nanopyx is not installed
 try:
     from nanopyx import eSRRF
-except ModuleNotFoundError:
+except ImportError:
 
     def eSRRF(img, **kwargs):
         # if nanopyx is not installed just returns the input image
